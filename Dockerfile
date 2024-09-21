@@ -18,6 +18,4 @@ RUN R -e "source('.Rprofile')"
 
 RUN R -e "renv::restore()"
 
-EXPOSE 8008
-
 CMD ["R", "-e", "source('/usr/local/Chronos-Scheduler/crontab.R')"]
