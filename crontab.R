@@ -1,15 +1,15 @@
 box::use(
   DBI[
     dbExecute
-  ]
-)
-
-box::use(
-  utils/supabase_utils[
+  ],
+  supabaseR[
     get_table_data,
     put_table_row,
     empty_table
   ],
+)
+
+box::use(
   utils/chronos_utils[
     get_combined_calendars
   ],

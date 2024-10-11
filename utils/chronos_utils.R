@@ -20,12 +20,9 @@ box::use(
   glue[
     glue
   ],
-)
-
-box::use(
-  utils/supabase_utils[
+  supabaseR[
     get_table_data
-  ]
+  ],
 )
 
 #' Get abbreviated weekday name.
