@@ -3,8 +3,12 @@
     "Version": "4.4.1",
     "Repositories": [
       {
+        "Name": "P3M",
+        "URL": "https://packagemanager.posit.co/cran/latest"
+      },
+      {
         "Name": "CRAN",
-        "URL": "https://cloud.r-project.org"
+        "URL": "https://cran.rstudio.com"
       }
     ]
   },
@@ -13,7 +17,7 @@
       "Package": "DBI",
       "Version": "1.2.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "methods"
@@ -24,7 +28,7 @@
       "Package": "R6",
       "Version": "2.5.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -34,7 +38,7 @@
       "Package": "RPostgres",
       "Version": "1.4.7",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "DBI",
         "R",
@@ -53,7 +57,7 @@
       "Package": "Rcpp",
       "Version": "1.0.13",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "methods",
         "utils"
@@ -64,7 +68,7 @@
       "Package": "V8",
       "Version": "5.0.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "Rcpp",
         "curl",
@@ -77,7 +81,7 @@
       "Package": "askpass",
       "Version": "1.2.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "sys"
       ],
@@ -87,7 +91,7 @@
       "Package": "backports",
       "Version": "1.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -97,7 +101,7 @@
       "Package": "bit",
       "Version": "4.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -107,7 +111,7 @@
       "Package": "bit64",
       "Version": "4.5.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "bit",
@@ -121,7 +125,7 @@
       "Package": "blob",
       "Version": "1.2.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "methods",
         "rlang",
@@ -133,7 +137,7 @@
       "Package": "box",
       "Version": "1.2.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "tools"
@@ -144,7 +148,7 @@
       "Package": "callr",
       "Version": "3.7.6",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "R6",
@@ -157,7 +161,7 @@
       "Package": "checkmate",
       "Version": "2.3.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "backports",
@@ -169,7 +173,7 @@
       "Package": "cli",
       "Version": "3.6.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "utils"
@@ -180,7 +184,7 @@
       "Package": "clipr",
       "Version": "0.8.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "utils"
       ],
@@ -190,7 +194,7 @@
       "Package": "codetools",
       "Version": "0.2-20",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -200,7 +204,7 @@
       "Package": "config",
       "Version": "0.3.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "yaml"
       ],
@@ -210,7 +214,7 @@
       "Package": "cpp11",
       "Version": "0.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -220,7 +224,7 @@
       "Package": "crayon",
       "Version": "1.5.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "grDevices",
         "methods",
@@ -232,7 +236,7 @@
       "Package": "credentials",
       "Version": "2.0.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "askpass",
         "curl",
@@ -246,7 +250,7 @@
       "Package": "curl",
       "Version": "5.2.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -256,7 +260,7 @@
       "Package": "cyclocomp",
       "Version": "1.1.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "callr",
         "crayon",
@@ -270,7 +274,7 @@
       "Package": "desc",
       "Version": "1.4.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "R6",
@@ -283,7 +287,7 @@
       "Package": "digest",
       "Version": "0.6.37",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "utils"
@@ -294,7 +298,7 @@
       "Package": "dplyr",
       "Version": "1.1.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "R6",
@@ -317,7 +321,7 @@
       "Package": "evaluate",
       "Version": "1.0.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -327,7 +331,7 @@
       "Package": "fansi",
       "Version": "1.0.6",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "grDevices",
@@ -339,7 +343,7 @@
       "Package": "fs",
       "Version": "1.6.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "methods"
@@ -350,7 +354,7 @@
       "Package": "generics",
       "Version": "0.1.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "methods"
@@ -361,7 +365,7 @@
       "Package": "gert",
       "Version": "2.1.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "askpass",
         "credentials",
@@ -394,7 +398,7 @@
       "Package": "gitcreds",
       "Version": "0.1.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -404,7 +408,7 @@
       "Package": "glue",
       "Version": "1.7.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "methods"
@@ -415,7 +419,7 @@
       "Package": "highr",
       "Version": "0.11",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "xfun"
@@ -426,7 +430,7 @@
       "Package": "hms",
       "Version": "1.1.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "lifecycle",
         "methods",
@@ -440,7 +444,7 @@
       "Package": "httr2",
       "Version": "1.0.5",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "R6",
@@ -476,14 +480,14 @@
       "Package": "ini",
       "Version": "0.3.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "6154ec2223172bce8162d4153cda21f7"
     },
     "jsonlite": {
       "Package": "jsonlite",
       "Version": "1.8.9",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "methods"
       ],
@@ -493,7 +497,7 @@
       "Package": "knitr",
       "Version": "1.48",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "evaluate",
@@ -509,7 +513,7 @@
       "Package": "lazyeval",
       "Version": "0.2.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -519,7 +523,7 @@
       "Package": "lifecycle",
       "Version": "1.0.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -532,7 +536,7 @@
       "Package": "lintr",
       "Version": "3.1.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "backports",
@@ -553,7 +557,7 @@
       "Package": "lubridate",
       "Version": "1.9.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "generics",
@@ -566,7 +570,7 @@
       "Package": "magrittr",
       "Version": "2.0.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -576,7 +580,7 @@
       "Package": "openssl",
       "Version": "2.2.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "askpass"
       ],
@@ -586,7 +590,7 @@
       "Package": "pillar",
       "Version": "1.9.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "cli",
         "fansi",
@@ -603,7 +607,7 @@
       "Package": "pkgconfig",
       "Version": "2.0.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "utils"
       ],
@@ -613,14 +617,14 @@
       "Package": "plogr",
       "Version": "0.2.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "09eb987710984fc2905c7129c7d85e65"
     },
     "processx": {
       "Package": "processx",
       "Version": "3.8.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "R6",
@@ -633,7 +637,7 @@
       "Package": "ps",
       "Version": "1.8.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "utils"
@@ -644,7 +648,7 @@
       "Package": "purrr",
       "Version": "1.0.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -659,7 +663,7 @@
       "Package": "rappdirs",
       "Version": "0.3.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -669,7 +673,7 @@
       "Package": "remotes",
       "Version": "2.5.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "methods",
@@ -693,7 +697,7 @@
       "Package": "rex",
       "Version": "1.2.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "lazyeval"
       ],
@@ -703,7 +707,7 @@
       "Package": "rlang",
       "Version": "1.1.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "utils"
@@ -714,7 +718,7 @@
       "Package": "rprojroot",
       "Version": "2.0.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -724,7 +728,7 @@
       "Package": "rstudioapi",
       "Version": "0.16.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "96710351d642b70e8f02ddeb237c46a7"
     },
     "stringi": {
@@ -744,7 +748,7 @@
       "Package": "stringr",
       "Version": "1.5.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -781,14 +785,14 @@
       "Package": "sys",
       "Version": "3.4.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "3a1be13d68d47a8cd0bfd74739ca1555"
     },
     "tibble": {
       "Package": "tibble",
       "Version": "3.2.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "fansi",
@@ -807,7 +811,7 @@
       "Package": "tidyr",
       "Version": "1.3.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -846,7 +850,7 @@
       "Package": "timechange",
       "Version": "0.3.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cpp11"
@@ -857,7 +861,7 @@
       "Package": "usethis",
       "Version": "3.0.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -888,7 +892,7 @@
       "Package": "utf8",
       "Version": "1.2.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -912,14 +916,14 @@
       "Package": "whisker",
       "Version": "0.4.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "c6abfa47a46d281a7d5159d0a8891e88"
     },
     "withr": {
       "Package": "withr",
       "Version": "3.0.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "grDevices",
@@ -931,7 +935,7 @@
       "Package": "xfun",
       "Version": "0.47",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "grDevices",
@@ -944,7 +948,7 @@
       "Package": "xml2",
       "Version": "1.3.6",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R",
         "cli",
@@ -957,7 +961,7 @@
       "Package": "xmlparsedata",
       "Version": "1.0.5",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Requirements": [
         "R"
       ],
@@ -967,14 +971,14 @@
       "Package": "yaml",
       "Version": "2.3.10",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "51dab85c6c98e50a18d7551e9d49f76c"
     },
     "zip": {
       "Package": "zip",
       "Version": "2.3.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "P3M",
       "Hash": "fcc4bd8e6da2d2011eb64a5e5cc685ab"
     }
   }
