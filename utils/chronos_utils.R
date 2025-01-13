@@ -30,7 +30,7 @@ box::use(
 #' @param date A date object.
 #' @return Abbreviated weekday name in uppercase.
 get_parsed_weekday <- function(
-    date
+  date
 ) {
   weekdays(date, abbreviate = TRUE) |>
     substr(start = 1, stop = 2) |>
@@ -44,9 +44,9 @@ get_parsed_weekday <- function(
 #' @param days A vector of weekday abbreviations.
 #' @return The number of days between the two weekdays.
 get_day_difference <- function(
-    from,
-    to,
-    days = c("MO", "TU", "WE", "TH", "FR", "SA", "SU")
+  from,
+  to,
+  days = c("MO", "TU", "WE", "TH", "FR", "SA", "SU")
 ) {
   (match(from, days) - match(to, days)) %% 7
 }
@@ -57,14 +57,14 @@ get_day_difference <- function(
 #' @param to_ignore A vector of event types to ignore.
 #' @return A processed data frame with status labels.
 process_calendar_df <- function(
-    calendar_df,
-    to_ignore = c(
-      "stay",
-      "vacation",
-      "holidays",
-      "optional",
-      "coffee together"
-    )
+  calendar_df,
+  to_ignore = c(
+    "stay",
+    "vacation",
+    "holidays",
+    "optional",
+    "coffee together"
+  )
 ) {
   to_ignore <- paste(to_ignore, collapse = "|")
   calendar_df |>
@@ -86,12 +86,19 @@ process_calendar_df <- function(
 #' @param calendar_df A data frame with calendar events.
 #' @return A data frame of weekly repeating events.
 process_weekly_repetition <- function(
-    calendar_df
+  calendar_df
 ) {
   calendar_df |>
     filter(
       rrule_freq == "WEEKLY",
       class == "PRIVATE"
+    ) |>
+    mutate(
+      rrule_byday = ifelse(
+        "rrule_byday" %in% names(calendar_df),
+        rrule_byday,
+        NA_character_
+      )
     ) |>
     separate_rows(rrule_byday, sep = ",") |>
     mutate(
@@ -145,9 +152,9 @@ combine_calendar_df <- function(
 #' @param priority The priorty of the calendar
 #' @return A data frame of events
 read_calendar <- function(
-    url,
-    name,
-    priority
+  url,
+  name,
+  priority
 ) {
   print(
     glue(
@@ -175,7 +182,7 @@ read_calendar <- function(
 #' @return A combined dataframe of parsed calendar events.
 #' @export
 get_combined_calendars <- function(
-    calendars = get_table_data("chronos_calendars")
+  calendars = get_table_data("chronos_calendars")
 ) {
   process_combined_calendars(
     lapply(
@@ -202,7 +209,7 @@ get_combined_calendars <- function(
 #' @param processed_calendars A list of dataframes from parsed calendar events.
 #' @return A single dataframe containing distinct calendar events.
 process_combined_calendars <- function(
-    processed_calendars
+  processed_calendars
 ) {
   do.call(
     rbind,
@@ -210,6 +217,15 @@ process_combined_calendars <- function(
   ) |>
     arrange(status) |>
     group_by(summary) |>
+    mutate(
+      summary = trimws(
+        gsub(
+          "\\[D\\]",
+          "",
+          summary
+        )
+      )
+    ) |>
     slice_min(
       order_by = priority,
       with_ties = TRUE
