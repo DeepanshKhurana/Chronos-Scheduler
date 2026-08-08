@@ -207,16 +207,6 @@
       ],
       "Hash": "61e097f35917d342622f21cdc79c256e"
     },
-    "config": {
-      "Package": "config",
-      "Version": "0.3.2",
-      "Source": "Repository",
-      "Repository": "P3M",
-      "Requirements": [
-        "yaml"
-      ],
-      "Hash": "8b7222e9d9eb5178eea545c0c4d33fc2"
-    },
     "cpp11": {
       "Package": "cpp11",
       "Version": "0.5.2",
@@ -702,20 +692,20 @@
     },
     "supabaseR": {
       "Package": "supabaseR",
-      "Version": "0.0.0.9003",
-      "Source": "git",
-      "RemoteType": "git",
-      "RemoteUrl": "https://github.com/DeepanshKhurana/supabaseR.git",
-      "RemoteRef": "",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "P3M",
       "Requirements": [
         "DBI",
+        "R",
         "RPostgres",
         "checkmate",
-        "config",
+        "cli",
+        "dplyr",
         "glue",
-        "jsonlite"
+        "httr2"
       ],
-      "Hash": "e84f723ec615ab84d2db5e95335a02d4"
+      "Hash": "d51c65b80ecb0ffc593190d5080c5dff"
     },
     "sys": {
       "Package": "sys",

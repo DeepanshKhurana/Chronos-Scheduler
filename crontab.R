@@ -1,11 +1,9 @@
 box::use(
-  DBI[
-    dbExecute
-  ],
   supabaseR[
-    get_table_data,
-    put_table_row,
-    empty_table
+    sb_connect,
+    sb_disconnect,
+    sb_insert,
+    sb_truncate
   ],
 )
 
@@ -15,20 +13,12 @@ box::use(
   ],
 )
 
-row_list <- apply(
-  get_combined_calendars(),
-  1,
-  as.list
-)
+#' Refresh the calendar data on chronos_cache table
+refresh_chronos_cache <- function() {
+  sb_connect()
+  on.exit(sb_disconnect(), add = TRUE)
+  sb_truncate("chronos_cache")
+  sb_insert("chronos_cache", data = get_combined_calendars())
+}
 
-empty_table("chronos_cache")
-
-lapply(
-  row_list,
-  function(row) {
-    put_table_row(
-      "chronos_cache",
-      row
-    )
-  }
-)
+refresh_chronos_cache()
