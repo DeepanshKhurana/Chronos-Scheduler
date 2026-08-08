@@ -77,6 +77,25 @@
       ],
       "Hash": "031fcc75f23e88e0be1bebcad1c442e7"
     },
+    "almanac": {
+      "Package": "almanac",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "V8",
+        "cli",
+        "glue",
+        "lifecycle",
+        "lubridate",
+        "magrittr",
+        "rlang",
+        "vctrs"
+      ],
+      "Hash": "368547a4027e4196d704bdf84af0895e"
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.2.1",

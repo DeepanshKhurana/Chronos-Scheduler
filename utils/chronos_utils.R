@@ -23,50 +23,104 @@ box::use(
   supabaseR[
     get_table_data
   ],
+  almanac[
+    alma_in,
+    daily,
+    monthly,
+    recur_for_count,
+    recur_on_day_of_week,
+    recur_on_interval,
+    recur_on_month_of_year,
+    weekly,
+    yearly
+  ],
+  purrr[
+    pmap
+  ],
 )
 
-#' Get abbreviated weekday name.
+#' RRULE BYDAY two-letter weekday codes, keyed to full weekday names.
+weekday_code_to_name <- c(
+  MO = "Monday",
+  TU = "Tuesday",
+  WE = "Wednesday",
+  TH = "Thursday",
+  FR = "Friday",
+  SA = "Saturday",
+  SU = "Sunday"
+)
+
+#' Build a recurrence schedule for a single (already BYDAY-split) event row.
 #'
-#' @param date A date object.
-#' @return Abbreviated weekday name in uppercase.
-get_parsed_weekday <- function(
-  date
+#' Delegates all RFC 5545 recurrence semantics (nth-weekday-of-month,
+#' nth-weekday-of-month-of-year, UNTIL/COUNT bounds, INTERVAL, defaulting
+#' BYDAY-less WEEKLY/MONTHLY/YEARLY rules to dtstart's weekday/day-of-month/
+#' month-and-day) to almanac, rather than reimplementing that date math
+#' by hand.
+#'
+#' @param dtstart The series' start date.
+#' @param rrule_freq One of DAILY, WEEKLY, MONTHLY, YEARLY.
+#' @param rrule_byday A single RRULE BYDAY token (e.g. "WE", "2WE", "-1FR"),
+#'   or NA/"" if absent.
+#' @param rrule_until The series' end date, or NA if unbounded.
+#' @param rrule_count The series' occurrence count, or NA if unbounded.
+#' @param rrule_interval The series' recurrence interval, or NA for 1.
+#' @param rrule_bymonth The RRULE BYMONTH value (1-12), or NA if absent.
+#'   Only used for YEARLY + BYDAY (e.g. "last Monday of May"); when absent,
+#'   defaults to dtstart's month.
+#' @return An almanac rschedule object.
+build_rschedule <- function(
+  dtstart,
+  rrule_freq,
+  rrule_byday = NA_character_,
+  rrule_until = as.Date(NA),
+  rrule_count = NA_integer_,
+  rrule_interval = NA_integer_,
+  rrule_bymonth = NA_integer_
 ) {
-  weekdays(date, abbreviate = TRUE) |>
-    substr(start = 1, stop = 2) |>
-    toupper()
-}
-
-#' Check if a date is the Nth occurrence of its weekday in its month.
-#'
-#' Interprets an RRULE MONTHLY BYDAY token such as "2WE" (2nd Wednesday)
-#' or "-1FR" (last Friday). A token with no leading ordinal (e.g. "WE")
-#' matches every occurrence of that weekday in the month. `date` must be
-#' a single Date; `byday` may be a vector.
-#'
-#' @param date A single date object.
-#' @param byday A character vector of RRULE BYDAY tokens.
-#' @return A logical vector, one per element of `byday`.
-matches_monthly_byday <- function(
-  date,
-  byday
-) {
-  code <- toupper(substr(byday, nchar(byday) - 1, nchar(byday)))
-  ordinal <- substr(byday, 1, nchar(byday) - 2)
-
-  day_of_month <- as.integer(format(date, "%d"))
-  n_from_start <- (day_of_month - 1) %/% 7 + 1
-
-  month_start <- as.Date(format(date, "%Y-%m-01"))
-  next_month_start <- seq(month_start, by = "month", length.out = 2)[2]
-  days_in_month <- as.integer(next_month_start - month_start)
-  n_from_end <- (days_in_month - day_of_month) %/% 7 + 1
-
-  get_parsed_weekday(date) == code & (
-    ordinal == "" |
-      (grepl("^[0-9]+$", ordinal) & as.integer(ordinal) == n_from_start) |
-      (grepl("^-[0-9]+$", ordinal) & abs(as.integer(ordinal)) == n_from_end)
+  freq_fn <- switch(
+    rrule_freq,
+    DAILY = daily,
+    WEEKLY = weekly,
+    MONTHLY = monthly,
+    YEARLY = yearly
   )
+
+  rschedule <- freq_fn(
+    since = dtstart,
+    until = if (is.na(rrule_until)) NULL else rrule_until
+  )
+
+  if (!is.na(rrule_interval) && rrule_interval > 1) {
+    rschedule <- rschedule |> recur_on_interval(rrule_interval)
+  }
+
+  if (!is.na(rrule_count)) {
+    rschedule <- rschedule |> recur_for_count(rrule_count)
+  }
+
+  if (rrule_freq == "YEARLY" && !is.na(rrule_byday) && rrule_byday != "") {
+    month_of_year <- if (is.na(rrule_bymonth)) {
+      as.integer(format(dtstart, "%m"))
+    } else {
+      rrule_bymonth
+    }
+    rschedule <- rschedule |> recur_on_month_of_year(month_of_year)
+  }
+
+  if (!is.na(rrule_byday) && rrule_byday != "") {
+    code <- toupper(substr(rrule_byday, nchar(rrule_byday) - 1, nchar(rrule_byday)))
+    ordinal <- substr(rrule_byday, 1, nchar(rrule_byday) - 2)
+    weekday_name <- weekday_code_to_name[[code]]
+
+    rschedule <- if (rrule_freq %in% c("MONTHLY", "YEARLY") && ordinal != "") {
+      rschedule |> recur_on_day_of_week(weekday_name, nth = as.integer(ordinal))
+    } else {
+      rschedule |> recur_on_day_of_week(weekday_name)
+    }
+  }
+
+  rschedule
 }
 
 #' Process calendar data frame.
@@ -101,12 +155,11 @@ process_calendar_df <- function(
 
 #' Process repeating events in calendar data.
 #'
-#' Handles DAILY, WEEKLY, MONTHLY, and YEARLY recurrence rules. WEEKLY
-#' events use rrule_byday when available, falling back to dtstart's
-#' weekday. MONTHLY events match on dtstart's day-of-month, and YEARLY
-#' events match on dtstart's month and day. Occurrences are bounded to
-#' the series' active window: on or after dtstart, and on or before
-#' rrule_until when present.
+#' Handles DAILY, WEEKLY, MONTHLY, and YEARLY recurrence rules, including
+#' UNTIL/COUNT bounds, INTERVAL, nth-weekday-of-month BYDAY tokens
+#' (e.g. "2WE", "-1FR"), and nth-weekday-of-month-of-year YEARLY BYDAY
+#' tokens (e.g. "-1MO" with BYMONTH=5, for "last Monday of May"), via
+#' almanac's recurrence rule engine.
 #'
 #' @param calendar_df A data frame with calendar events.
 #' @return A data frame of repeating events occurring today or tomorrow.
@@ -116,70 +169,83 @@ process_recurring_events <- function(
   today <- Sys.Date()
   tomorrow <- Sys.Date() + 1
 
-  if (!("rrule_byday" %in% names(calendar_df))) {
-    calendar_df$rrule_byday <- NA_character_
+  for (col in c("rrule_byday", "rrule_until", "rrule_count", "rrule_interval", "rrule_bymonth")) {
+    if (!(col %in% names(calendar_df))) {
+      calendar_df[[col]] <- NA_character_
+    }
   }
 
-  if (!("rrule_until" %in% names(calendar_df))) {
-    calendar_df$rrule_until <- NA_character_
-  }
-
-  calendar_df |>
+  recurring_df <- calendar_df |>
     filter(
       rrule_freq %in% c("DAILY", "WEEKLY", "MONTHLY", "YEARLY")
     ) |>
     mutate(
       dtstart = as.Date(dtstart),
-      rrule_until = as.Date(rrule_until)
+      rrule_until = as.Date(rrule_until),
+      rrule_count = suppressWarnings(as.integer(rrule_count)),
+      rrule_interval = suppressWarnings(as.integer(rrule_interval)),
+      rrule_bymonth = suppressWarnings(as.integer(rrule_bymonth))
     ) |>
     separate_rows(rrule_byday, sep = ",") |>
     mutate(
-      rrule_byday = trimws(rrule_byday),
-      in_range_today = today >= dtstart &
-        (is.na(rrule_until) | today <= rrule_until),
-      in_range_tomorrow = tomorrow >= dtstart &
-        (is.na(rrule_until) | tomorrow <= rrule_until),
-      matches_today = in_range_today & case_when(
-        rrule_freq == "DAILY" ~ TRUE,
-        rrule_freq == "WEEKLY" & !is.na(rrule_byday) & rrule_byday != "" ~
-          get_parsed_weekday(today) == rrule_byday,
-        rrule_freq == "WEEKLY" ~
-          get_parsed_weekday(today) == get_parsed_weekday(dtstart),
-        rrule_freq == "MONTHLY" & !is.na(rrule_byday) & rrule_byday != "" ~
-          matches_monthly_byday(today, rrule_byday),
-        rrule_freq == "MONTHLY" ~ format(today, "%d") == format(dtstart, "%d"),
-        rrule_freq == "YEARLY" ~ format(today, "%m-%d") == format(dtstart, "%m-%d"),
-        TRUE ~ FALSE
-      ),
-      matches_tomorrow = in_range_tomorrow & case_when(
-        rrule_freq == "DAILY" ~ TRUE,
-        rrule_freq == "WEEKLY" & !is.na(rrule_byday) & rrule_byday != "" ~
-          get_parsed_weekday(tomorrow) == rrule_byday,
-        rrule_freq == "WEEKLY" ~
-          get_parsed_weekday(tomorrow) == get_parsed_weekday(dtstart),
-        rrule_freq == "MONTHLY" & !is.na(rrule_byday) & rrule_byday != "" ~
-          matches_monthly_byday(tomorrow, rrule_byday),
-        rrule_freq == "MONTHLY" ~ format(tomorrow, "%d") == format(dtstart, "%d"),
-        rrule_freq == "YEARLY" ~ format(tomorrow, "%m-%d") == format(dtstart, "%m-%d"),
-        TRUE ~ FALSE
-      ),
-      start = today,
-      status = case_when(
-        matches_today ~ "TODAY",
-        matches_tomorrow ~ "TOMORROW",
-        TRUE ~ NA_character_
-      )
-    ) |>
+      rrule_byday = trimws(rrule_byday)
+    )
+
+  if (nrow(recurring_df) == 0) {
+    recurring_df$start <- as.Date(character())
+    recurring_df$status <- character()
+    return(
+      recurring_df |>
+        select(
+          -dtstart,
+          -rrule_freq,
+          -rrule_byday,
+          -rrule_until,
+          -rrule_count,
+          -rrule_interval,
+          -rrule_bymonth
+        )
+    )
+  }
+
+  rschedules <- pmap(
+    list(
+      dtstart = recurring_df$dtstart,
+      rrule_freq = recurring_df$rrule_freq,
+      rrule_byday = recurring_df$rrule_byday,
+      rrule_until = recurring_df$rrule_until,
+      rrule_count = recurring_df$rrule_count,
+      rrule_interval = recurring_df$rrule_interval,
+      rrule_bymonth = recurring_df$rrule_bymonth
+    ),
+    build_rschedule
+  )
+
+  recurring_df$status <- vapply(
+    rschedules,
+    function(rschedule) {
+      if (alma_in(today, rschedule)) {
+        "TODAY"
+      } else if (alma_in(tomorrow, rschedule)) {
+        "TOMORROW"
+      } else {
+        NA_character_
+      }
+    },
+    character(1)
+  )
+
+  recurring_df |>
+    mutate(start = today) |>
     filter(!is.na(status)) |>
     select(
       -dtstart,
       -rrule_freq,
       -rrule_byday,
       -rrule_until,
-      -in_range_today,
-      -in_range_tomorrow,
-      -matches_today,
-      -matches_tomorrow
+      -rrule_count,
+      -rrule_interval,
+      -rrule_bymonth
     )
 }
 
