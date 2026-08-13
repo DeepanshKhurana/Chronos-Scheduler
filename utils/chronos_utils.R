@@ -426,7 +426,8 @@ combine_calendar_df <- function(
       start,
       status,
       event_start_time,
-      event_end_time
+      event_end_time,
+      attendees
     ) |>
     distinct() |>
     arrange(status)
