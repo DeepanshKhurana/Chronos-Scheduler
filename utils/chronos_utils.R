@@ -125,20 +125,47 @@ build_rschedule <- function(
   rschedule
 }
 
-#' Extract per-event timezone metadata directly from raw ICS text.
+#' Format a VEVENT's ATTENDEE properties as a single display string.
 #'
-#' ical::ical_parse_df() silently drops the TZID parameter on DTSTART/DTEND:
-#' a value like "DTSTART;TZID=America/New_York:20260810T093000" comes back
+#' @param attendee_props A list of raw ATTENDEE property entries (from the
+#'   jCal-style structure returned by ical_parse_full()), possibly empty.
+#' @return "Name (STATUS), Name (STATUS), ..." or NA if there are none.
+format_attendees <- function(
+  attendee_props
+) {
+  if (length(attendee_props) == 0) {
+    return(NA_character_)
+  }
+
+  entries <- vapply(
+    attendee_props,
+    function(prop) {
+      params <- prop[[2]]
+      name <- if (!is.null(params$cn)) params$cn else sub("^mailto:", "", prop[[4]])
+      status <- if (!is.null(params$partstat)) params$partstat else "NEEDS-ACTION"
+      sprintf("%s (%s)", name, status)
+    },
+    character(1)
+  )
+
+  paste(entries, collapse = ", ")
+}
+
+#' Extract per-event metadata that ical::ical_parse_df() doesn't expose.
+#'
+#' ical_parse_df() silently drops the TZID parameter on DTSTART/DTEND (a
+#' value like "DTSTART;TZID=America/New_York:20260810T093000" comes back
 #' as the bare naive datetime "2026-08-10 09:30:00" with no indication it
-#' isn't in the local system timezone. This walks the lower-level jCal-style
-#' structure from ical_parse_full(), which does retain TZID and the value
-#' type (date vs date-time), keyed by uid so it can be joined back onto the
-#' ical_parse_df() output.
+#' isn't in the local system timezone) and doesn't expose ATTENDEE
+#' properties at all. This walks the lower-level jCal-style structure from
+#' ical_parse_full(), which retains both, keyed by uid so it can be joined
+#' back onto the ical_parse_df() output.
 #'
 #' @param raw_lines Character vector of raw ICS lines (as read by readLines).
 #' @return A data frame with columns uid (unique, non-NA), dtstart_tzid (NA
 #'   when the value was UTC-normalized or floating - no correction needed),
-#'   and dtstart_is_date_only (TRUE for all-day/VALUE=DATE events).
+#'   dtstart_is_date_only (TRUE for all-day/VALUE=DATE events), and
+#'   attendees ("Name (STATUS), ..." or NA if none).
 extract_event_time_metadata <- function(
   raw_lines
 ) {
@@ -150,6 +177,7 @@ extract_event_time_metadata <- function(
       properties <- vevent[[2]]
       uid_prop <- Find(function(p) identical(p[[1]], "uid"), properties)
       dtstart_prop <- Find(function(p) identical(p[[1]], "dtstart"), properties)
+      attendee_props <- Filter(function(p) identical(p[[1]], "attendee"), properties)
 
       dtstart_tzid <- if (!is.null(dtstart_prop)) dtstart_prop[[2]]$tzid else NULL
       dtstart_valuetype <- if (!is.null(dtstart_prop)) dtstart_prop[[3]] else NA_character_
@@ -158,6 +186,7 @@ extract_event_time_metadata <- function(
         uid = if (!is.null(uid_prop)) uid_prop[[4]] else NA_character_,
         dtstart_tzid = if (is.null(dtstart_tzid)) NA_character_ else dtstart_tzid,
         dtstart_is_date_only = isTRUE(dtstart_valuetype == "date"),
+        attendees = format_attendees(attendee_props),
         stringsAsFactors = FALSE
       )
     }
@@ -168,7 +197,7 @@ extract_event_time_metadata <- function(
   # A left_join on uid would otherwise explode into a many-to-many match:
   # events with no uid at all share NA==NA, and RFC 5545 exception/override
   # instances of a recurring event legitimately share the master's uid.
-  # Neither case needs more than one row's worth of tz metadata per uid.
+  # Neither case needs more than one row's worth of metadata per uid.
   metadata <- metadata[!is.na(metadata$uid), ]
   metadata[!duplicated(metadata$uid), ]
 }
@@ -237,6 +266,9 @@ process_calendar_df <- function(
   if (!("dtstart_is_date_only" %in% names(calendar_df))) {
     calendar_df$dtstart_is_date_only <- FALSE
   }
+  if (!("attendees" %in% names(calendar_df))) {
+    calendar_df$attendees <- NA_character_
+  }
 
   to_ignore <- paste(to_ignore, collapse = "|")
   processed_df <- calendar_df |>
@@ -303,6 +335,9 @@ process_recurring_events <- function(
   }
   if (!("dtstart_is_date_only" %in% names(calendar_df))) {
     calendar_df$dtstart_is_date_only <- FALSE
+  }
+  if (!("attendees" %in% names(calendar_df))) {
+    calendar_df$attendees <- NA_character_
   }
 
   recurring_df <- calendar_df |>
