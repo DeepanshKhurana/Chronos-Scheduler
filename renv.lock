@@ -434,7 +434,7 @@
     },
     "ical": {
       "Package": "ical",
-      "Version": "0.3.0",
+      "Version": "0.3.1",
       "Source": "git",
       "RemoteType": "git",
       "RemoteUrl": "https://github.com/DeepanshKhurana/ical.git",
@@ -442,7 +442,7 @@
       "Requirements": [
         "V8"
       ],
-      "Hash": "b9af21a62649c4912ccfcbcfb60bc9eb"
+      "Hash": "0f5822f3bea0f6a62ebcd33c349b075b"
     },
     "ini": {
       "Package": "ini",

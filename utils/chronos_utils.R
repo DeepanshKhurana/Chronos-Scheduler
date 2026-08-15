@@ -245,20 +245,19 @@ compute_event_times <- function(
   list(start = event_start_time, end = event_end_time)
 }
 
-#' Process calendar data frame.
+#' Event title keywords with no reliable structured signal to catch them by
+#' (see LOGIC.md).
+DEFAULT_IGNORED_SUMMARIES <- c("stay", "vacation", "holidays")
+
+#' Process calendar data frame. See LOGIC.md for why the original STATUS
+#' is checked before it's overwritten below.
 #'
 #' @param calendar_df A data frame with calendar events.
 #' @param to_ignore A vector of event types to ignore.
 #' @return A processed data frame with status labels and event times.
 process_calendar_df <- function(
   calendar_df,
-  to_ignore = c(
-    "stay",
-    "vacation",
-    "holidays",
-    "optional",
-    "coffee together"
-  )
+  to_ignore = DEFAULT_IGNORED_SUMMARIES
 ) {
   if (!("dtstart_tzid" %in% names(calendar_df))) {
     calendar_df$dtstart_tzid <- NA_character_
@@ -275,8 +274,9 @@ process_calendar_df <- function(
     mutate(
       start = as.Date(dtstart),
       is_ignored = grepl(to_ignore, tolower(summary)),
+      is_cancelled = !is.na(status) & toupper(status) == "CANCELLED",
       status = case_when(
-        is_ignored ~ NA_character_,
+        is_ignored | is_cancelled ~ NA_character_,
         start == Sys.Date() ~ "TODAY",
         start == (Sys.Date() + 1) ~ "TOMORROW",
         TRUE ~ NA_character_
@@ -318,12 +318,16 @@ process_calendar_df <- function(
 #' almanac's recurrence rule engine.
 #'
 #' @param calendar_df A data frame with calendar events.
+#' @param to_ignore A vector of event types to ignore, matched the same way
+#'   (and against the same default list) as process_calendar_df's.
 #' @return A data frame of repeating events occurring today or tomorrow.
 process_recurring_events <- function(
-  calendar_df
+  calendar_df,
+  to_ignore = DEFAULT_IGNORED_SUMMARIES
 ) {
   today <- Sys.Date()
   tomorrow <- Sys.Date() + 1
+  to_ignore_pattern <- paste(to_ignore, collapse = "|")
 
   for (col in c("rrule_byday", "rrule_until", "rrule_count", "rrule_interval", "rrule_bymonth")) {
     if (!(col %in% names(calendar_df))) {
@@ -340,9 +344,17 @@ process_recurring_events <- function(
     calendar_df$attendees <- NA_character_
   }
 
+  # Cross-checked against each series' own computed occurrence below - see LOGIC.md.
+  override_instances <- calendar_df |>
+    filter(is.na(rrule_freq)) |>
+    mutate(override_date = as.Date(dtstart)) |>
+    select(uid, override_date) |>
+    distinct()
+
   recurring_df <- calendar_df |>
     filter(
-      rrule_freq %in% c("DAILY", "WEEKLY", "MONTHLY", "YEARLY")
+      rrule_freq %in% c("DAILY", "WEEKLY", "MONTHLY", "YEARLY"),
+      !grepl(to_ignore_pattern, tolower(summary))
     ) |>
     mutate(
       dtstart_date = as.Date(dtstart),
@@ -407,6 +419,14 @@ process_recurring_events <- function(
 
   recurring_df$status <- vapply(occurrence, `[[`, character(1), "status")
   recurring_df$start <- do.call(c, lapply(occurrence, `[[`, "start"))
+
+  recurring_df <- recurring_df |>
+    left_join(
+      override_instances |> mutate(has_override = TRUE),
+      by = c("uid", "start" = "override_date")
+    )
+  recurring_df$status[!is.na(recurring_df$has_override)] <- NA_character_
+  recurring_df$has_override <- NULL
 
   recurring_df <- recurring_df |> filter(!is.na(status))
 
